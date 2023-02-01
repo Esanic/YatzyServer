@@ -8,7 +8,7 @@ module.exports = (io) => {
     // let room = 'game-'+counter
 
     io.on('connection', socket => {
-        console.log('new connection', socket.id); 
+        console.log('new connection', socket.id);
         socket.emit('userID', socket.id)
 
 		socket.on('disconnect', () => {
@@ -16,32 +16,32 @@ module.exports = (io) => {
             if(index != -1){
                 participants.splice(index, 1);
             }
+            io.emit('disconnected', socket.id);
             console.log(socket.id + ' disconnected');
         });
         
         //Join Room
         socket.on('joinRoom', (name) => {
+            
             if(participants.length <= 4){
                 participants.push({name: name, sid: socket.id});
                 socket.join(room);
+                io.to(room).emit('amtOfPlayers', participants.length)
                 socket.emit('roomName', room);
                 
                 if(participants.length == 4){
                     io.to(room).emit('fullGame', true);
                     io.to(room).emit('players', participants);
+                    console.log(room, 'has started.')
                 }
             }
             if(participants.length > 4){
-                
                 room = 'game-'+(counter+1);
                 socket.join(room);
                 participants = []
                 participants.push(name);
                 console.log(room);
             }
-
-            console.log(participants);
-            console.log(io.sockets.adapter.rooms.get(room))
         })
         
         //Dice Hit
