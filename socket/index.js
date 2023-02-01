@@ -8,21 +8,22 @@ module.exports = (io) => {
     // let room = 'game-'+counter
 
     io.on('connection', socket => {
-        console.log('new connection', socket.id);
+        console.log(new Date(),': new connection', socket.id);
         socket.emit('userID', socket.id)
 
 		socket.on('disconnect', () => {
             let index = participants.findIndex(x => x.sid == socket.id);
             if(index != -1){
                 participants.splice(index, 1);
+                io.emit('disconnectedInQueue', participants.length)
             }
             io.emit('disconnected', socket.id);
-            console.log(socket.id + ' disconnected');
+            
+            console.log(new Date(),': ', socket.id, ' disconnected');
         });
         
         //Join Room
         socket.on('joinRoom', (name) => {
-            
             if(participants.length <= 4){
                 participants.push({name: name, sid: socket.id});
                 socket.join(room);
@@ -32,7 +33,7 @@ module.exports = (io) => {
                 if(participants.length == 4){
                     io.to(room).emit('fullGame', true);
                     io.to(room).emit('players', participants);
-                    console.log(room, 'has started.')
+                    console.log(new Date(), ': ', room, 'has started.')
                 }
             }
             if(participants.length > 4){
