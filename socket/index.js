@@ -8,7 +8,7 @@ module.exports = (io) => {
     // let room = 'game-'+counter
 
     io.on('connection', socket => {
-        console.log(new Date(),': new connection', socket.id);
+        console.log('new connection', socket.id);
         socket.emit('userID', socket.id)
 
 		socket.on('disconnect', () => {
@@ -19,7 +19,7 @@ module.exports = (io) => {
             }
             io.emit('disconnected', socket.id);
             
-            console.log(new Date(),': ', socket.id, ' disconnected');
+            console.log(socket.id, ' disconnected');
         });
         
         //Join Room
@@ -27,13 +27,14 @@ module.exports = (io) => {
             if(participants.length <= 4){
                 participants.push({name: name, sid: socket.id});
                 socket.join(room);
+                console.log(socket.id, 'has joined', room)
                 io.to(room).emit('amtOfPlayers', participants.length)
                 socket.emit('roomName', room);
                 
                 if(participants.length == 4){
                     io.to(room).emit('fullGame', true);
                     io.to(room).emit('players', participants);
-                    console.log(new Date(), ': ', room, 'has started.')
+                    console.log(room, 'has started.')
                 }
             }
             if(participants.length > 4){
