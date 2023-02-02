@@ -1,12 +1,12 @@
-let participantsTwosGame = [];
+let playerTwosGame = [];
 let counterTwoPlayer = 0;
 let roomTwoPlayer = '[2]Game-'+counterTwoPlayer;
 
-let participantsThreeGame = [];
+let playerThreeGame = [];
 let counterThreePlayer = 0;
 let roomThreePlayer = '[3]Game-'+counterThreePlayer;
 
-let participantsFourGame = [];
+let playerFourGame = [];
 let counterFourPlayer = 0;
 let roomFourPlayer = '[4]Game-'+counterFourPlayer;
 
@@ -20,34 +20,37 @@ module.exports = (io) => {
     io.on('connection', socket => {
         console.log('new connection', socket.id);
         socket.emit('userID', socket.id)
+        
+        //Online check
+        socket.emit('online', true)
 
 		socket.on('disconnect', () => {
-            let index = participantsFourGame.findIndex(x => x.sid == socket.id);
+            let index = playerFourGame.findIndex(x => x.sid == socket.id);
             
             //If user found in participantsFourGame
             if(index !== -1){
-                participantsFourGame.splice(index, 1);
-                io.emit('disconnectedInQueueFour', participantsFourGame.length)
+                playerFourGame.splice(index, 1);
+                io.emit('disconnectedInQueueFour', playerFourGame.length)
             }
             
             //If user not found in participantsFourGame
             if(index === -1){
-                index = participantsThreeGame.findIndex(x => x.sid === socket.id)
+                index = playerThreeGame.findIndex(x => x.sid === socket.id)
 
                 //If user found in participantsThreeGame
                 if(index !== -1){
-                    participantsThreeGame.splice(index, 1);
-                    io.emit('disconnectedInQueueThree', participantsThreeGame.length);
+                    playerThreeGame.splice(index, 1);
+                    io.emit('disconnectedInQueueThree', playerThreeGame.length);
                 }
                 
                 //If user not found in participantsThreeGame
                 if(index === -1){
-                    index = participantsTwosGame.findIndex(x => x.sid === socket.id);
+                    index = playerTwosGame.findIndex(x => x.sid === socket.id);
                     
                     //If user found in participantsTwosGame
                     if(index !== -1){
-                        participantsTwosGame.splice(index, 1);
-                        io.emit('disconnectedInQueueTwos', participantsTwosGame.length)
+                        playerTwosGame.splice(index, 1);
+                        io.emit('disconnectedInQueueTwos', playerTwosGame.length)
                     }
                 }
             }
@@ -62,73 +65,76 @@ module.exports = (io) => {
             
             //If user wants to join a two-player room
             if(maxPlayers === 2){
-                if(participantsTwosGame.length <= 2){
-                    participantsTwosGame.push({name: name, sid: socket.id});
+                if(playerTwosGame.length <= 2){
+                    playerTwosGame.push({name: name, sid: socket.id});
                     socket.join(roomTwoPlayer);
                     console.log(socket.id, 'has joined', roomTwoPlayer)
-                    io.to(roomTwoPlayer).emit('amtOfPlayers', participantsTwosGame.length)
+                    io.to(roomTwoPlayer).emit('amtOfPlayers', playerTwosGame.length)
                     socket.emit('roomName', roomTwoPlayer);
                     
-                    if(participantsTwosGame.length === 2){
+                    if(playerTwosGame.length === 2){
                         io.to(roomTwoPlayer).emit('fullGame', true);
-                        io.to(roomTwoPlayer).emit('players', participantsTwosGame);
+                        io.to(roomTwoPlayer).emit('players', playerTwosGame);
                         console.log(roomTwoPlayer, 'has started.')
                     }
                 }
-                if(participantsTwosGame.length > 2){
+                if(playerTwosGame.length > 2){
                     roomTwoPlayer = '[2]Game-'+(counterTwoPlayer++);
-                    participantsTwosGame = []
+                    playerTwosGame = []
                     socket.join(roomTwoPlayer);
                     console.log(socket.id, 'has joined', roomTwoPlayer)
-                    participantsTwosGame.push({name: name, sid: socket.id});
+                    playerTwosGame.push({name: name, sid: socket.id});
                 }
             }
 
             //If user wants to join a three-player room
             if(maxPlayers === 3){
-                if(participantsThreeGame.length <= 3){
-                    participantsThreeGame.push({name: name, sid: socket.id});
+                if(playerThreeGame.length <= 3){
+                    playerThreeGame.push({name: name, sid: socket.id});
                     socket.join(roomThreePlayer);
                     console.log(socket.id, 'has joined', roomThreePlayer)
-                    io.to(roomThreePlayer).emit('amtOfPlayers', participantsThreeGame.length)
+                    io.to(roomThreePlayer).emit('amtOfPlayers', playerThreeGame.length)
                     socket.emit('roomName', roomThreePlayer);
                     
-                    if(participantsThreeGame.length === 3){
+                    if(playerThreeGame.length === 3){
                         io.to(roomThreePlayer).emit('fullGame', true);
-                        io.to(roomThreePlayer).emit('players', participantsThreeGame);
+                        io.to(roomThreePlayer).emit('players', playerThreeGame);
                         console.log(roomThreePlayer, 'has started.')
                     }
                 }
-                if(participantsThreeGame.length > 3){
+                if(playerThreeGame.length > 3){
                     roomThreePlayer = '[3]Game-'+(counterThreePlayer++);
-                    participantsThreeGame = []
+                    playerThreeGame = []
                     socket.join(roomThreePlayer);
-                    participantsThreeGame.push({name: name, sid: socket.id});
+                    playerThreeGame.push({name: name, sid: socket.id});
                 }
             }
 
             //If user wants to join a four-player room
             if(maxPlayers === 4){
-                if(participantsFourGame.length <= 4){
-                    participantsFourGame.push({name: name, sid: socket.id});
+                if(playerFourGame.length <= 4){
+                    playerFourGame.push({name: name, sid: socket.id});
                     socket.join(roomFourPlayer);
                     console.log(socket.id, 'has joined', roomFourPlayer)
-                    io.to(roomFourPlayer).emit('amtOfPlayers', participantsFourGame.length)
+                    io.to(roomFourPlayer).emit('amtOfPlayers', playerFourGame.length)
                     socket.emit('roomName', roomFourPlayer);
                     
-                    if(participantsFourGame.length == 4){
+                    if(playerFourGame.length == 4){
                         io.to(roomFourPlayer).emit('fullGame', true);
-                        io.to(roomFourPlayer).emit('players', participantsFourGame);
+                        io.to(roomFourPlayer).emit('players', playerFourGame);
                         console.log(roomFourPlayer, 'has started.')
                     }
                 }
-                if(participantsFourGame.length > 4){
+                if(playerFourGame.length > 4){
                     roomFourPlayer = '[4]Game-'+(counterFourPlayer++);
-                    participantsFourGame = []
+                    playerFourGame = []
                     socket.join(room);
-                    participantsFourGame.push({name: name, sid: socket.id});
+                    playerFourGame.push({name: name, sid: socket.id});
                 }
             }
+        })
+        socket.on('checkOnline', x => {
+            socket.emit('online', true)
         })
         
         //Dice Hit
