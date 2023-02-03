@@ -76,6 +76,9 @@ module.exports = (io) => {
                         io.to(roomTwoPlayer).emit('fullGame', true);
                         io.to(roomTwoPlayer).emit('players', playerTwosGame);
                         console.log(roomTwoPlayer, 'has started.')
+
+                        roomTwoPlayer = '[2]Game-'+(counterTwoPlayer++);
+                        playerTwosGame = []
                     }
                 }
                 if(playerTwosGame.length > 2){
@@ -100,6 +103,9 @@ module.exports = (io) => {
                         io.to(roomThreePlayer).emit('fullGame', true);
                         io.to(roomThreePlayer).emit('players', playerThreeGame);
                         console.log(roomThreePlayer, 'has started.')
+
+                        roomThreePlayer = '[3]Game-'+(counterThreePlayer++);
+                        playerThreeGame = []
                     }
                 }
                 if(playerThreeGame.length > 3){
@@ -123,6 +129,9 @@ module.exports = (io) => {
                         io.to(roomFourPlayer).emit('fullGame', true);
                         io.to(roomFourPlayer).emit('players', playerFourGame);
                         console.log(roomFourPlayer, 'has started.')
+
+                        roomFourPlayer = '[4]Game-'+(counterFourPlayer++);
+                        playerFourGame = []
                     }
                 }
                 if(playerFourGame.length > 4){
