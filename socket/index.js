@@ -139,12 +139,12 @@ module.exports = (io) => {
         
         //Dice Hit
         socket.on('diceHit', (dice, room) => {
-            io.to(room).emit('getDice', dice);
+            socket.broadcast.to(room).emit('getDice', dice);
         })
 
         //Dice Movement
         socket.on('diceMove', (objWithDiceArrays, room) => {
-            io.to(room).emit('getDiceMovement', objWithDiceArrays);
+            socket.broadcast.to(room).emit('getDiceMovement', objWithDiceArrays);
         })
 
         //Next player
