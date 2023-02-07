@@ -13,10 +13,6 @@ let roomFourPlayers = '[4]Game-'+counterFourPlayers;
 
 
 module.exports = (io) => {
-    const rooms = io.of("/game").adapter.rooms;
-    const sids = io.of("/game").adapter.sids;
-    // let room = 'game-'+counter
-
     io.on('connection', socket => {
         console.log('new connection', socket.id);
         socket.emit('userID', socket.id)
@@ -32,17 +28,20 @@ module.exports = (io) => {
             //If user found in participantsFourGame
             if(indexFourPlayer !== -1){
                 playerFourQueue.splice(indexFourPlayer, 1);
+                emitQueueNumbers();
                 io.emit('disconnectedInQueueFour', playerFourQueue.length)
             }
             //If user found in participantsThreeGame
             if(indexThreePlayer !== -1){
                 playerThreeQueue.splice(indexThreePlayer, 1);
+                emitQueueNumbers();
                 io.emit('disconnectedInQueueThree', playerThreeQueue.length);
             }
             //If user found in participantsTwosGame
             if(indexTwoPlayer !== -1){
-                playerThreeQueue.splice(indexTwoPlayer, 1);
-                io.emit('disconnectedInQueueThree', playerThreeQueue.length);
+                playerTwosQueue.splice(indexTwoPlayer, 1);
+                emitQueueNumbers();
+                io.emit('disconnectedInQueueThree', playerTwosQueue.length);
             }
             
             io.emit('disconnected', socket.id);
