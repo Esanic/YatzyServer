@@ -1,14 +1,14 @@
 let playerTwosQueue = [];
-let counterTwoPlayers = 0;
-let roomTwoPlayers = '[2]Game-'+counterTwoPlayers;
+let counterTwoPlayers = {counter:0};
+let roomTwoPlayers = {room:'[2]Game-'+counterTwoPlayers.counter};
 
 let playerThreeQueue = [];
-let counterThreePlayers = 0;
-let roomThreePlayers = '[3]Game-'+counterThreePlayers;
+let counterThreePlayers = {counter:0};
+let roomThreePlayers = {room:'[3]Game-'+counterThreePlayers.counter};
 
 let playerFourQueue = [];
-let counterFourPlayers = 0;
-let roomFourPlayers = '[4]Game-'+counterFourPlayers;
+let counterFourPlayers = {counter:0};
+let roomFourPlayers = {room:'[4]Game-'+counterFourPlayers.counter};
 
 
 
@@ -93,16 +93,16 @@ module.exports = (io) => {
             if(queueArray.length <= numOfPlayers){
                 queueArray.push({name: name, sid: socket.id});
                 emitQueueNumbers();
-                socket.join(room);
-                console.log(socket.id, 'has joined', room);
-                io.to(room).emit('amtOfPlayers', queueArray.length)
-                socket.emit('roomName', room);
+                socket.join(room.room);
+                console.log(socket.id, 'has joined', room.room);
+                io.to(room.room).emit('amtOfPlayers', queueArray.length)
+                socket.emit('roomName', room.room);
                 
                 if(queueArray.length === numOfPlayers){
-                    io.to(room).emit('fullGame', true);
-                    io.to(room).emit('players', queueArray);
-                    console.log(room, 'has started.')
-                    room = '['+counter+']Game-'+(counter++);
+                    io.to(room.room).emit('fullGame', true);
+                    io.to(room.room).emit('players', queueArray);
+                    console.log(room.room, 'has started.')
+                    room.room = '['+numOfPlayers+']Game-'+(counter.counter += 1);
                     queueArray.length = 0;
                     emitQueueNumbers();
                 }
