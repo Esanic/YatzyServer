@@ -20,7 +20,12 @@ module.exports = (io) => {
         //Online check
         socket.emit('online', true)
 
-		socket.on('disconnect', () => {
+        socket.on('reconnect', (attempt) => {
+            console.log(socket.id + ' reconnected after' + attempt + ' attempt(s)')
+        })
+
+		socket.on('disconnect', (reason) => {
+            console.log(reason);
             let indexFourPlayer = playerFourQueue.findIndex(x => x.sid === socket.id);
             let indexThreePlayer = playerThreeQueue.findIndex(x => x.sid === socket.id);
             let indexTwoPlayer = playerTwosQueue.findIndex(x => x.sid === socket.id);
