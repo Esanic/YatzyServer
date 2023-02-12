@@ -14,18 +14,12 @@ let roomFourPlayers = {room:'[4]Game-'+counterFourPlayers.counter};
 
 module.exports = (io) => {
     io.on('connection', socket => {
-        console.log('new connection', socket.id);
         socket.emit('userID', socket.id)
         
         //Online check
         socket.emit('online', true)
 
-        socket.on('reconnect', (attempt) => {
-            console.log(socket.id + ' reconnected after' + attempt + ' attempt(s)')
-        })
-
 		socket.on('disconnect', (reason) => {
-            console.log(reason);
             let indexFourPlayer = playerFourQueue.findIndex(x => x.sid === socket.id);
             let indexThreePlayer = playerThreeQueue.findIndex(x => x.sid === socket.id);
             let indexTwoPlayer = playerTwosQueue.findIndex(x => x.sid === socket.id);
@@ -66,14 +60,6 @@ module.exports = (io) => {
                 joinRoom(4, playerFourQueue, name, socket, roomFourPlayers, counterFourPlayers);
             }
         })
-
-        socket.on('checkOnline', x => {
-            socket.emit('online', true)
-        })
-
-        socket.on('triggerQueue', x => {
-            emitQueueNumbers();
-        })
         
         //Dice Hit
         socket.on('diceHit', (dice, room) => {
@@ -88,6 +74,22 @@ module.exports = (io) => {
         //Next player
         socket.on('nextPlayer',(scoreRowName, dice, room) => {
             socket.broadcast.to(room).emit('getNextPlayer', {scoreRowName, dice})
+        })
+
+        //Once game is done, disconnect all clients from room.
+        socket.on('gameDone', (room) => {
+            io.in(room).socketsLeave(room);
+            console.log(`Game ${room} is done. Disconnecting clients...`)
+        })
+
+        //Responds in order to set the current online status
+        socket.on('checkOnline', x => {
+            socket.emit('online', true)
+        })
+
+        //In order to display queue numbers
+        socket.on('triggerQueue', x => {
+            emitQueueNumbers();
         })
 
         function emitQueueNumbers() {

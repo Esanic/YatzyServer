@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
- var { app, io } = require('../app');         //<-------------
+ var { app, io } = require('../app');
 var debug = require('debug')('server:server');
 var http = require('http');
 
@@ -34,7 +34,7 @@ server.on('listening', onListening);
  * Attach io with http server.
  */
 
- io.attach(server);                             //<-------------
+ io.attach(server);
 
 /**
  * Normalize a port into a number, string, or false.
