@@ -24,19 +24,19 @@ module.exports = (io) => {
             let indexThreePlayer = playerThreeQueue.findIndex(x => x.sid === socket.id);
             let indexTwoPlayer = playerTwosQueue.findIndex(x => x.sid === socket.id);
             
-            //If user found in participantsFourGame
+            //If user found in playerFourQueue
             if(indexFourPlayer !== -1){
                 playerFourQueue.splice(indexFourPlayer, 1);
                 emitQueueNumbers();
                 io.emit('disconnectedInQueueFour', playerFourQueue.length)
             }
-            //If user found in participantsThreeGame
+            //If user found in playerThreeQueue
             if(indexThreePlayer !== -1){
                 playerThreeQueue.splice(indexThreePlayer, 1);
                 emitQueueNumbers();
                 io.emit('disconnectedInQueueThree', playerThreeQueue.length);
             }
-            //If user found in participantsTwosGame
+            //If user found in playerTwosQueue
             if(indexTwoPlayer !== -1){
                 playerTwosQueue.splice(indexTwoPlayer, 1);
                 emitQueueNumbers();
