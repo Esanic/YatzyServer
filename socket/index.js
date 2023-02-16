@@ -43,10 +43,14 @@ module.exports = (io) => {
                 io.emit('disconnectedInQueueThree', playerTwosQueue.length);
             }
             
-            io.emit('disconnected', socket.id);
+            // io.emit('disconnected', socket.id);
             
             console.log(socket.id, ' disconnected');
         });
+
+        socket.on('reconnect', () => {
+            console.log(`${socket.id} reconnected`)
+        })
         
         //Join Room
         socket.on('joinRoom', (name, maxPlayers) => {
