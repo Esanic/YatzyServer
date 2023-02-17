@@ -14,36 +14,42 @@ let roomFourPlayers = {room:'[4]Game-'+counterFourPlayers.counter};
 
 module.exports = (io) => {
     io.on('connection', socket => {
+        console.log(socket.id + " connected");
         socket.emit('userID', socket.id)
         
         //Online check
         socket.emit('online', true)
 
 		socket.on('disconnect', (reason) => {
-            let indexFourPlayer = playerFourQueue.findIndex(x => x.sid === socket.id);
-            let indexThreePlayer = playerThreeQueue.findIndex(x => x.sid === socket.id);
-            let indexTwoPlayer = playerTwosQueue.findIndex(x => x.sid === socket.id);
+            console.log(reason);
+            if(reason === 'transport close'){
+                let indexFourPlayer = playerFourQueue.findIndex(x => x.sid === socket.id);
+                let indexThreePlayer = playerThreeQueue.findIndex(x => x.sid === socket.id);
+                let indexTwoPlayer = playerTwosQueue.findIndex(x => x.sid === socket.id);
+                
+                //If user found in playerFourQueue
+                if(indexFourPlayer !== -1){
+                    playerFourQueue.splice(indexFourPlayer, 1);
+                    emitQueueNumbers();
+                    io.emit('disconnectedInQueueFour', playerFourQueue.length)
+                }
+                //If user found in playerThreeQueue
+                if(indexThreePlayer !== -1){
+                    playerThreeQueue.splice(indexThreePlayer, 1);
+                    emitQueueNumbers();
+                    io.emit('disconnectedInQueueThree', playerThreeQueue.length);
+                }
+                //If user found in playerTwosQueue
+                if(indexTwoPlayer !== -1){
+                    playerTwosQueue.splice(indexTwoPlayer, 1);
+                    emitQueueNumbers();
+                    io.emit('disconnectedInQueueThree', playerTwosQueue.length);
+                }
+                
+                io.emit('disconnected', socket.id);
+            }
+
             
-            //If user found in playerFourQueue
-            if(indexFourPlayer !== -1){
-                playerFourQueue.splice(indexFourPlayer, 1);
-                emitQueueNumbers();
-                io.emit('disconnectedInQueueFour', playerFourQueue.length)
-            }
-            //If user found in playerThreeQueue
-            if(indexThreePlayer !== -1){
-                playerThreeQueue.splice(indexThreePlayer, 1);
-                emitQueueNumbers();
-                io.emit('disconnectedInQueueThree', playerThreeQueue.length);
-            }
-            //If user found in playerTwosQueue
-            if(indexTwoPlayer !== -1){
-                playerTwosQueue.splice(indexTwoPlayer, 1);
-                emitQueueNumbers();
-                io.emit('disconnectedInQueueThree', playerTwosQueue.length);
-            }
-            
-            // io.emit('disconnected', socket.id);
             
             console.log(socket.id, ' disconnected');
         });
