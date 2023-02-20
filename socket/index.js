@@ -10,10 +10,12 @@ let playerFourQueue = [];
 let counterFourPlayers = {counter:0};
 let roomFourPlayers = {room:'[4]Game-'+counterFourPlayers.counter};
 
-
-
 module.exports = (io) => {
     io.on('connection', socket => {
+        if(socket.recovered){
+            console.log(socket.id + 'reconnected');
+        }
+
         console.log(socket.id + " connected");
         socket.emit('userID', socket.id)
         
@@ -51,7 +53,7 @@ module.exports = (io) => {
 
             
             
-            console.log(socket.id, ' disconnected');
+            console.log(socket.id + ' disconnected');
         });
 
         socket.on('reconnect', () => {
