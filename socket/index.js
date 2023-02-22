@@ -15,94 +15,93 @@ module.exports = (io) => {
         if(socket.recovered){
             console.log(socket.id + 'reconnected');
         }
-
-        console.log(socket.id + " connected");
-        socket.emit('userID', socket.id)
-        
-        //Online check
-        socket.emit('online', true)
-
-		socket.on('disconnect', (reason) => {
-            console.log(reason);
-            if(reason === 'transport close'){
-                let indexFourPlayer = playerFourQueue.findIndex(x => x.sid === socket.id);
-                let indexThreePlayer = playerThreeQueue.findIndex(x => x.sid === socket.id);
-                let indexTwoPlayer = playerTwosQueue.findIndex(x => x.sid === socket.id);
-                
-                //If user found in playerFourQueue
-                if(indexFourPlayer !== -1){
-                    playerFourQueue.splice(indexFourPlayer, 1);
-                    emitQueueNumbers();
-                    io.emit('disconnectedInQueueFour', playerFourQueue.length)
-                }
-                //If user found in playerThreeQueue
-                if(indexThreePlayer !== -1){
-                    playerThreeQueue.splice(indexThreePlayer, 1);
-                    emitQueueNumbers();
-                    io.emit('disconnectedInQueueThree', playerThreeQueue.length);
-                }
-                //If user found in playerTwosQueue
-                if(indexTwoPlayer !== -1){
-                    playerTwosQueue.splice(indexTwoPlayer, 1);
-                    emitQueueNumbers();
-                    io.emit('disconnectedInQueueThree', playerTwosQueue.length);
-                }
-                
-                io.emit('disconnected', socket.id);
-            }
-
+        else {
+            console.log(socket.id + " connected");
+            socket.emit('userID', socket.id)
             
-            
-            console.log(socket.id + ' disconnected');
-        });
-
-        socket.on('reconnect', () => {
-            console.log(`${socket.id} reconnected`)
-        })
-        
-        //Join Room
-        socket.on('joinRoom', (name, maxPlayers) => {
-            if(maxPlayers === 2){
-                joinRoom(2, playerTwosQueue, name, socket, roomTwoPlayers, counterTwoPlayers);
-            }
-            if(maxPlayers === 3){
-                joinRoom(3, playerThreeQueue, name, socket, roomThreePlayers, counterThreePlayers);
-            }
-            if(maxPlayers === 4){
-                joinRoom(4, playerFourQueue, name, socket, roomFourPlayers, counterFourPlayers);
-            }
-        })
-        
-        //Dice Hit
-        socket.on('diceHit', (dice, room) => {
-            socket.broadcast.to(room).emit('getDice', dice);
-        })
-
-        //Dice Movement
-        socket.on('diceMove', (objWithDiceArrays, room) => {
-            socket.broadcast.to(room).emit('getDiceMovement', objWithDiceArrays);
-        })
-
-        //Next player
-        socket.on('nextPlayer',(scoreRowName, dice, room) => {
-            socket.broadcast.to(room).emit('getNextPlayer', {scoreRowName, dice})
-        })
-
-        //Once game is done, disconnect all clients from room.
-        socket.on('gameDone', (room) => {
-            io.in(room).socketsLeave(room);
-            console.log(`Game ${room} is done. Disconnecting clients...`)
-        })
-
-        //Responds in order to set the current online status
-        socket.on('checkOnline', x => {
+            //Online check
             socket.emit('online', true)
-        })
 
-        //In order to display queue numbers
-        socket.on('triggerQueue', x => {
-            emitQueueNumbers();
-        })
+            socket.on('disconnect', (reason) => {
+                console.log(reason);
+                if(reason === 'transport close'){
+                    let indexFourPlayer = playerFourQueue.findIndex(x => x.sid === socket.id);
+                    let indexThreePlayer = playerThreeQueue.findIndex(x => x.sid === socket.id);
+                    let indexTwoPlayer = playerTwosQueue.findIndex(x => x.sid === socket.id);
+                    
+                    //If user found in playerFourQueue
+                    if(indexFourPlayer !== -1){
+                        playerFourQueue.splice(indexFourPlayer, 1);
+                        emitQueueNumbers();
+                        io.emit('disconnectedInQueueFour', playerFourQueue.length)
+                    }
+                    //If user found in playerThreeQueue
+                    if(indexThreePlayer !== -1){
+                        playerThreeQueue.splice(indexThreePlayer, 1);
+                        emitQueueNumbers();
+                        io.emit('disconnectedInQueueThree', playerThreeQueue.length);
+                    }
+                    //If user found in playerTwosQueue
+                    if(indexTwoPlayer !== -1){
+                        playerTwosQueue.splice(indexTwoPlayer, 1);
+                        emitQueueNumbers();
+                        io.emit('disconnectedInQueueThree', playerTwosQueue.length);
+                    }
+                    
+                    io.emit('disconnected', socket.id);
+                }
+
+                console.log(socket.id + ' disconnected');
+            });
+
+            socket.on('reconnect', () => {
+                console.log(`${socket.id} reconnected`)
+            })
+            
+            //Join Room
+            socket.on('joinRoom', (name, maxPlayers) => {
+                if(maxPlayers === 2){
+                    joinRoom(2, playerTwosQueue, name, socket, roomTwoPlayers, counterTwoPlayers);
+                }
+                if(maxPlayers === 3){
+                    joinRoom(3, playerThreeQueue, name, socket, roomThreePlayers, counterThreePlayers);
+                }
+                if(maxPlayers === 4){
+                    joinRoom(4, playerFourQueue, name, socket, roomFourPlayers, counterFourPlayers);
+                }
+            })
+            
+            //Dice Hit
+            socket.on('diceHit', (dice, room) => {
+                socket.broadcast.to(room).emit('getDice', dice);
+            })
+
+            //Dice Movement
+            socket.on('diceMove', (objWithDiceArrays, room) => {
+                socket.broadcast.to(room).emit('getDiceMovement', objWithDiceArrays);
+            })
+
+            //Next player
+            socket.on('nextPlayer',(scoreRowName, dice, room) => {
+                socket.broadcast.to(room).emit('getNextPlayer', {scoreRowName, dice})
+            })
+
+            //Once game is done, disconnect all clients from room.
+            socket.on('gameDone', (room) => {
+                io.in(room).socketsLeave(room);
+                console.log(`Game ${room} is done. Disconnecting clients...`)
+            })
+
+            //Responds in order to set the current online status
+            socket.on('checkOnline', x => {
+                socket.emit('online', true)
+            })
+
+            //In order to display queue numbers
+            socket.on('triggerQueue', x => {
+                emitQueueNumbers();
+            })
+        }
 
         function emitQueueNumbers() {
             io.emit('queueNumbers', {qTwo: playerTwosQueue.length, qThree: playerThreeQueue.length, qFour: playerFourQueue.length})
