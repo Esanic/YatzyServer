@@ -5,10 +5,15 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
 // require socket.io
-const io = require('socket.io')();
+const io = require('socket.io')({
+  connectionStateRecovery: {
+    // the backup duration of the sessions and the packets
+    maxDisconnectionDuration: 2 * 60 * 1000,
+    // whether to skip middlewares upon successful recovery
+    skipMiddlewares: true,
+  }
+});
 require('./socket')(io);
-
-
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
