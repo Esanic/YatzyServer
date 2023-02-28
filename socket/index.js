@@ -86,8 +86,9 @@ module.exports = (io) => {
                 socket.broadcast.to(room).emit('getNextPlayer', {scoreRowName, dice})
             })
 
-            //Once game is done, disconnect all clients from room.
+            //Once game is done, emit it to all clients and disconnect all clients from room.
             socket.on('gameDone', (room) => {
+                io.to(room).emit('endOfGame', true);
                 io.in(room).socketsLeave(room);
                 console.log(`Game ${room} is done. Disconnecting clients...`)
             })
